@@ -1,0 +1,7 @@
+# Private – never upload
+profile.txt
+seen.txt
+jobs_found.csv
+results.csv
+ads.txt
+__pycache__/

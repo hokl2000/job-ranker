@@ -1,0 +1,14 @@
+# EXAMPLE PROFILE – copy this file, name the copy profile.txt, and replace everything with your own information.
+# profile.txt stays on your computer and is not uploaded to GitHub (see .gitignore).
+# Lines starting with # are ignored. Keep the same headings so the scoring works.
+Navn: Alex Jensen (fictional example)
+Bopæl: Valby. Ingen bil – offentlig transport eller cykel. Kun job på Sjælland.
+Uddannelse: Cand.scient. i data science (2022).
+Erfaring: 3 års erfaring som dataanalytiker i en mellemstor virksomhed.
+- Byggede dashboards i Power BI til salg og økonomi.
+- Automatiserede dataudtræk med Python og SQL.
+Værktøjer: Python, SQL, Power BI, Excel.
+Sprog: dansk og engelsk flydende.
+Ønsker: tager gerne stillinger på eller lidt under sit erfaringsniveau.
+Prioriterede spor (point ud af 15): data 15, IT/digitale projekter 10, andet 0.
+Fordele: AI/automatisering i jobbet.
