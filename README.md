@@ -51,3 +51,35 @@ To score ads you paste yourself, put them in `ads.txt` (one ad per block, empty 
 - Employer ad pages that are built in the browser with JavaScript can't be read; the Jobindex summary is used instead.
 - kk.dk titles come from the link, so æ/ø/å appear as ae/oe/aa.
 - Scores vary by up to ~10 points between runs – use them to sort, not as exact truth.
+
+## tool_loop.py – an AI agent
+
+`find_jobs.py` + `rank_job.py` is a fixed pipeline: Python decides every step and Claude scores each ad.
+`tool_loop.py` is an agent: you give it a question, and Claude decides which tools to call to answer it.
+
+- **Tools:** `list_ads()` (the scored job list) and `get_ad(number)` (fetches one ad's text)
+- **Protocol:** Claude answers each turn in JSON (`call_tool` or `final`), forced by a JSON schema
+- **Python holds the memory and the brakes:** max 8 turns, max 5 web fetches
+- **Safeguards:** Claude gives a row number, never a URL (least privilege); ad text is treated as data, not instructions; cut text is marked so the model knows it is incomplete
+
+## tool_loop.py – an AI agent
+
+`find_jobs.py` + `rank_job.py` is a fixed pipeline: Python decides every step and Claude scores each ad.
+`tool_loop.py` is an agent: you give it a question, and Claude decides which tools to call to answer it.
+
+- **Tools:** `list_ads()` (the scored job list) and `get_ad(number)` (fetches one ad's text)
+- **Protocol:** Claude answers each turn in JSON (`call_tool` or `final`), forced by a JSON schema
+- **Python holds the memory and the brakes:** max 8 turns, max 5 web fetches
+- **Safeguards:** Claude gives a row number, never a URL (least privilege); ad text is treated as data, not instructions; cut text is marked so the model knows it is incomplete
+
+Run: `python tool_loop.py` (needs `jobs_found.csv` from `find_jobs.py`).## tool_loop.py – an AI agent
+
+`find_jobs.py` + `rank_job.py` is a fixed pipeline: Python decides every step and Claude scores each ad.
+`tool_loop.py` is an agent: you give it a question, and Claude decides which tools to call to answer it.
+
+- **Tools:** `list_ads()` (the scored job list) and `get_ad(number)` (fetches one ad's text)
+- **Protocol:** Claude answers each turn in JSON (`call_tool` or `final`), forced by a JSON schema
+- **Python holds the memory and the brakes:** max 8 turns, max 5 web fetches
+- **Safeguards:** Claude gives a row number, never a URL (least privilege); ad text is treated as data, not instructions; cut text is marked so the model knows it is incomplete
+
+Run: `python tool_loop.py` (needs `jobs_found.csv` from `find_jobs.py`).
