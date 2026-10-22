@@ -63,3 +63,16 @@ To score ads you paste yourself, put them in `ads.txt` (one ad per block, empty 
 - **Safeguards:** Claude gives a row number, never a URL (least privilege); ad text is treated as data, not instructions; cut text is marked so the model knows it is incomplete
 
 Run: `python tool_loop.py` (needs `jobs_found.csv` from `find_jobs.py`).
+
+## Second backend: the official Anthropic SDK (tested, never run live)
+
+`tool_loop.py` can talk to Claude in two ways, chosen by `BACKEND` in its settings:
+
+- `"cli"` (default): `claude -p` via the Claude Code CLI on a Claude Pro login. This is the backend that actually runs.
+- `"sdk"`: Anthropic's official Python SDK with its built-in tool use (tools with `input_schema`, `stop_reason == "tool_use"`, `tool_result` blocks sent back).
+
+The SDK backend is **never run live**: it needs an API key, and API usage is billed separately from Claude Pro. Instead it is unit-tested with a fake client that returns scripted responses:
+
+    python test_tool_loop.py
+
+The test needs no API key, no internet and no `anthropic` package. It reads `jobs_found.csv`, so run `find_jobs.py` first. Real use would add `import anthropic` and `client = anthropic.Anthropic()`.
