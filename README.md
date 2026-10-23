@@ -36,7 +36,7 @@ find_jobs.py                                    rank_job.py
 ## Setup
 
 1. Install [Claude Code](https://code.claude.com/docs/en/setup) and log in (`claude`). The tool calls it with `claude -p`.
-2. Python 3.10+ (only the standard library is used – nothing to install).
+2. Python 3.10+. The main tool uses only the standard library. The ML experiment (`ml_prefilter.py`) also needs scikit-learn: `python -m pip install scikit-learn`.
 3. Copy `profile_example.txt` to `profile.txt` and fill in your own profile. `profile.txt` is private and is not uploaded.
 4. Run:
    ```
@@ -76,3 +76,49 @@ The SDK backend is **never run live**: it needs an API key, and API usage is bil
     python test_tool_loop.py
 
 The test needs no API key, no internet and no `anthropic` package. It reads `jobs_found.csv`, so run `find_jobs.py` first. Real use would add `import anthropic` and `client = anthropic.Anthropic()`.
+
+## Experiment: a cheap ML pre-filter (ml_prefilter.py)
+
+**Question:** can a small, free model decide from the job title alone which ads are worth
+sending to `rank_job.py`, so Claude scores fewer ads?
+
+**How it works**
+1. `make_labels.py` asks Claude (via `rank_job.py`, title only) to score 96 job titles and saves
+   them in `labels.csv` (private, not on GitHub). Titles come from `jobs_found.csv` and, if it
+   exists, `titles_joblog.txt` (my private job log, not on GitHub).
+2. `ml_prefilter.py` turns each title into numbers with TF-IDF and trains a logistic regression
+   (scikit-learn, `class_weight="balanced"`) on 72 titles, then tests it on the other 24.
+3. It compares the model with Claude's labels: recall, precision and the confusion matrix
+   at the probability lines 0.5, 0.4 and 0.3.
+
+`rank_job.py` is unchanged: the full ad is still what gets scored. The pre-filter would only
+decide which ads are sent to it.
+
+**Label line:** Claude's title-only scores are lower than full-ad scores (only 1 of 96 titles
+reached 70). Jobs that scored 70+ on the full ad got 55–65 from their titles, so a title
+score of 55 or more counts as label 1 (49 of 96 titles).
+
+**Results (test set: 24 titles, 12 with label 1)**
+
+| Line | Recall | Precision | Sent on to rank_job.py | Good titles dropped |
+|---|---|---|---|---|
+| 0.5 | 83 % | 62 % | 16 of 24 | 2 |
+| 0.4 | 100 % | 50 % | 24 of 24 | 0 |
+| 0.3 | 100 % | 50 % | 24 of 24 | 0 |
+
+**Conclusion for now:** not used. At 0.4 and 0.3 the filter sends every ad on, so it saves
+nothing. At 0.5 it saves 8 of 24 Claude calls but drops 2 of 12 good titles. Missing a good
+job costs more than a few extra Claude calls, so every ad still goes to `rank_job.py`.
+
+**Limits, and why this should be tested again**
+- Small data: 96 titles and only 12 label-1 titles in the test set, so one title moves
+  recall by about 8 points. The numbers are rough.
+- Title-only labels measure what Claude guesses from a title, not what it decides from the
+  full ad.
+- A few jobs appear twice under different titles and may land in both the training and the
+  test set, which can make the test look better than it is.
+- With more titles (more `find_jobs.py` runs, then `make_labels.py` again) the number of
+  dropped good jobs and saved calls may change. Rerun `ml_prefilter.py` then and decide again.
+
+**Run it:** `python make_labels.py` (uses your Claude login via `claude -p`), then
+`python ml_prefilter.py`. Tests: `python test_ml_prefilter.py` (no internet, no Claude).

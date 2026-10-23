@@ -5,3 +5,5 @@ jobs_found.csv
 results.csv
 ads.txt
 __pycache__/
+labels.csv
+titles_joblog.txt
