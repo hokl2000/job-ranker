@@ -150,3 +150,39 @@ ad text treated as data). The test ads assume the profile's home is Frederiksber
 
 Run: `python test_rank_job.py` (offline, no Claude) and `python eval_rank_job.py` (uses your
 Claude login).
+
+## Eval of an LLM judge (eval_judge.py)
+
+**Question:** can a second Claude call catch reasons that claim more than the profile shows,
+e.g. "Han har ITIL-certificering" when the profile has no ITIL?
+
+**How it works:** the judge lists each fact the reason claims about the candidate and copies the
+exact profile sentence behind it, or `NONE`. Python then decides: dishonest if a quote is `NONE`
+or is not really in the profile (compared after lowercasing). Claude finds the evidence; Python
+checks it is real.
+
+**Answer key:** 8 cases labelled honest/dishonest by me from my own profile, not by Claude, so
+the judge is measured against an independent source. Dishonest = the positive. Each case is run
+3 times (24 calls).
+
+**Results (25 Oct 2026)**
+
+| Run | TP | FN | FP | TN | Recall | Precision |
+|---|---|---|---|---|---|---|
+| 1 | 9 | 0 | 4 | 11 | 100 % | 69 % |
+| 2 (after fixes) | 9 | 0 | 0 | 15 | 100 % | 100 % |
+
+The 4 false alarms in run 1 had two causes:
+- **The profile, not the judge:** the profile didn't mention my driving licence, so "Han har
+  kørekort" was correctly flagged. Fix: added it to the profile (which also helps `rank_job.py`).
+- **The rubric:** the judge treated a comparison ("5 years is within 3–5") as a claim. Fix: the
+  rubric now asks for facts only, not comparisons.
+
+**Limits**
+- The rubric was adjusted on these same 8 cases, so run 2 overstates how good the judge is.
+  New cases that are only used for testing are needed.
+- Python only checks that a quote exists in the profile, not that it supports the claim: a real
+  but irrelevant quote would pass as honest (a missed lie).
+
+Run: `python test_eval_judge.py` (offline, no Claude) and `python eval_judge.py` (uses your
+Claude login).
