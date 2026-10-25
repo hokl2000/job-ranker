@@ -7,3 +7,6 @@ ads.txt
 __pycache__/
 labels.csv
 titles_joblog.txt
+
+job_log.md
+job_log_count.txt

@@ -189,3 +189,22 @@ The 4 false alarms in run 1 had two causes:
 
 Run: `python test_eval_judge.py` (offline, no Claude) and `python eval_judge.py` (uses your
 Claude login).
+
+## Checking the weekly job agent's output (check_job_log.py)
+
+My weekly job agent is a scheduled Claude task that adds rows to a private job log. Its output
+varies, but the rules in the log's own header must hold every time, so Python checks them exactly:
+
+1. Sent is a `YYYY-MM-DD` date.
+2. Deadline is a date, `unknown` or `unknown (checked YYYY-MM-DD)` (checked with a regular expression).
+3. Status starts with an allowed word (sent, applied, interview, rejected, no answer, not interested, expired).
+4. Rows from 14 Oct 2026 on store the full ad URL (`https://…`).
+5. Rows from the newest run (the newest Sent date) have status `sent`. Only I set the other statuses,
+   so older rows are not checked for this. Run the check right after a run, before I update any of
+   the new rows.
+6. No rows deleted: the row count is compared with the count saved at the last check.
+
+**Result (25 Oct 2026):** 76 rows, all rules passed.
+
+Run: save a copy of the log as `job_log.md` (private, not on GitHub), then `python check_job_log.py`.
+Tests: `python test_check_job_log.py` (offline; uses made-up rows that break rules 2, 4 and 5).
