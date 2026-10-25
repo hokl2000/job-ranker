@@ -180,7 +180,10 @@ The 4 false alarms in run 1 had two causes:
 
 **Limits**
 - The rubric was adjusted on these same 8 cases, so run 2 overstates how good the judge is.
-  New cases that are only used for testing are needed.
+  So 5 **held-out cases** (labelled by me, never used to adjust the rubric) are kept for the
+  final check: `python eval_judge.py held-out`. Result (25 Oct 2026): TP 6, FN 0, FP 0, TN 9 –
+  recall 100 %, precision 100 %. That includes "Han taler flydende tysk", where the profile
+  mentions German only as an advantage for the job. Still a small set: 5 cases, 2 of them lies.
 - Python only checks that a quote exists in the profile, not that it supports the claim: a real
   but irrelevant quote would pass as honest (a missed lie).
 
